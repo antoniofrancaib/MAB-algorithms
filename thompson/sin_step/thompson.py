@@ -1,0 +1,66 @@
+import numpy as np
+from main import *
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+import math
+
+class ThompsonCampaign(object):
+    """ This class has information about the normal distribution of the ROI estimate for each campaign
+    beta distribution is not possible as ROI is expected to be more than 1 but beta distribution values go from 0 to 1
+    """
+    def __init__(self, id):
+        self.id = id
+        self.N = 0  # Time step num
+        self.variance = 100  # Flatten distributions
+        self.sum = 0  # sum of ROI across time steps
+        self.mean_estimate = 0  # ROI mean estimate
+        self.spent_campaign = []
+        self.profitability_campaign = []  # absolute return on that campaign
+
+    def sample(self):
+        """
+        Returns a random sample of the distribution
+        """
+        threshold = 0.1
+        sample = np.random.randn() / np.sqrt(self.variance) + self.mean_estimate
+        if sample > 0:
+            return sample
+        else:
+            return threshold
+
+    def update(self, roi, spent):
+        """
+        x --> ROI en un time step
+        """
+        self.variance = pow((1 / pow(100, 2) + self.N), -1)
+        self.spent_campaign.append(spent)
+        self.profitability_campaign.append(roi * spent)
+        self.mean_estimate = sum(self.profitability_campaign) / sum(self.spent_campaign)
+        self.N += 1
+
+
+class ThompsonAgent(object):
+    def __init__(self, state):
+        self.state = state
+
+    def act(self):
+        """updates the t_campaigns distributions"""
+        for i, t_campaign in enumerate(self.state.t_campaigns):
+            t_campaign.update(self.state.campaigns[i].roi[-1], self.state.campaigns[i].spent[-1])
+
+        """samples each distribution and change state.budget_percentual_distribution"""
+        mean_estimates = [t_campaign.mean_estimate for t_campaign in self.state.t_campaigns]
+        distribution = [estimate / sum(mean_estimates) for estimate in mean_estimates]
+
+        """updates state.percentual_budget_allocation """
+        self.state.update(distribution)
+
+    def plot(self):
+        x = np.linspace(-3, 6, 200)
+        for t_campaign in self.state.t_campaigns:
+            y = norm.pdf(x, t_campaign.mean_estimate, np.sqrt(t_campaign.variance))
+            plt.plot(x, y, label=f"estimated mean: {t_campaign.mean_estimate:.4f}")
+        plt.title(f"Bandit distributions after {self.state.current_time} time steps")
+        plt.legend()
+        plt.show()
