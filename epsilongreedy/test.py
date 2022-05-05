@@ -1,7 +1,7 @@
 from scipy.interpolate import make_interp_spline, BSpline
 import os 
 from main import *
-from mab import *
+from epsilongreedy import *
 import time
 
 #we should do the testing here
@@ -18,35 +18,37 @@ def get_key(val,my_dict):
  
     return "key doesn't exist"
 
-def test(time,total_budget,initial_q,initial_visits):
+def test(time,budget, amount_campaigns, initial_q, initial_visits):
 
-    campaign1 = Campaign(0,0,0,0,2)
-    campaign2 = Campaign(1,0,0,0,0.2)
-    campaign3 = Campaign(2,0,0,0,3)
+    id_names = []
+    initial_rois = []
+    for i in range(amount_campaigns):
+        id_names.append(i)
+        initial_rois.append(np.random.uniform(1.2, 2.6))
 
-    campaigns = [campaign1,campaign2,campaign3]
+    initial_percentual_allocation = {}
+    for name in id_names:
+        initial_percentual_allocation[name] = 1 / amount_campaigns
+
+    initial_budget_allocation = [(budget / time) * initial_percentual_allocation[i] for i in
+                                 initial_percentual_allocation]
+    campaigns = []
+    for n in range(amount_campaigns):
+        campaigns.append(Campaign(id_names[n], initial_budget_allocation[n], 0, 0, initial_rois[n]))
+
     test_env = State(total_budget,time,campaigns)
 
 
-    #epsilon_agent = EpsilonGreedyAgent(test_env, 0.9, 0.9, 5,time)
-    #epsilon_agent_result = epsilon_agent.act()
-    
-    #softmax_agent = SoftmaxExplorationAgent(test_env, tau=0.5, max_iterations=time)
-    #softmax_agent_result = softmax_agent.act()
+    epsilon_agent = EpsilonGreedyAgent(test_env, 0.9, 0.9, 5,time)
+    epsilon_agent_result = epsilon_agent.act()
 
-    optimistic_agent = OptimisticAgent(test_env,initial_q,initial_visits,time)
-    optimistic_agent_result = optimistic_agent.act()
-
-    #ucb_agent = UCBAgent(test_env, 1,time)
-    #ucb_agent_result = ucb_agent.act()
-
-    total_rewards = sum(optimistic_agent_result["rewards"])
+    total_rewards = sum(epsilon_agent_result["rewards"])
     print(f"Total Reward : {total_rewards}")
     
     
     #-Visualize results-
-    cum_rewards = optimistic_agent_result["cum_rewards"]
-    arm_counts = optimistic_agent_result["arm_counts"]
+    cum_rewards = epsilon_agent_result["cum_rewards"]
+    arm_counts = epsilon_agent_result["arm_counts"]
     rewards = np.array([sum(test_env.history[i+1][1]) for i in range(len(test_env.history)-1)])
     T = np.array(range(1,test_env.time-1))
 
@@ -69,6 +71,7 @@ def test(time,total_budget,initial_q,initial_visits):
 
 time_steps = 100
 total_budget = 5000
+amount = 3
 results = {}
 iterations = int(input('Select the number of iterations: '))
 print('Calculating estimate of total computation time...')
@@ -91,7 +94,7 @@ for visit in range(len(explore_visits)):
         tests = []
         for i in range(iterations):
             actions +=1
-            tests.append(test(time_steps,total_budget,explore_q[q],explore_visits[visit]))
+            tests.append(test(time_steps,total_budget,amount, explore_q[q],explore_visits[visit]))
         results[(explore_q[q],explore_visits[visit])] = Average(tests)
 end = time.time() 
 totalTime = end - start

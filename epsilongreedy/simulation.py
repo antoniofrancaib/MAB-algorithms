@@ -1,5 +1,5 @@
 from main import *
-from mab import SimulationAgent, AI
+from epsilongreedy import SimulationAgent, AI
 
 
 def budget_printer(state):
