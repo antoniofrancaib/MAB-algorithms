@@ -49,8 +49,7 @@ class State(Campaign):
 
 
     def dynamic(self, budget_distribution):
-        """gives new ROI, gives new spent, i.e. simulates an interaction with the real world
-        adds a new roi for every roi list of each campaign, adds a new spent for the list in the state"""
+        """gives new ROI, gives new spent, i.e. simulates an interaction with the real world"""
         for campaign in self.campaigns:
             a = random.randint(0, 2)
             roi_obtained = []

@@ -1,0 +1,8 @@
+ALGORITHM,ITERATIONS,BUDGET,TIME,AMOUNT CAMPAIGNS,INITIAL ROIS RANGE,FINAL ROI
+thompson_sin_step,2000,5000,100,3,"[1.2, 2.6]",1.973
+thompson_sin_step,4000,5000,100,3,"[1.2, 2.6]",1.97
+thompson_sin_step,4000,5000,100,3,"[0.8, 3]",2.012
+thompson_sin_step,4000,5000,100,6,"[0.8, 3]",2.02375
+thompson_sin_step,4000,500000,100,6,"[0.8, 3]",2.02
+thompson_sin_step,4000,500000,10000,6,"[0.8, 3]",2.01975
+thompson_sin_step,4000,500000,10000,10,"[0.8, 3]",2.00725
