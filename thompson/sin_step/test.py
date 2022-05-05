@@ -1,16 +1,16 @@
-from main import *
-from thompson import *
+""" we run this test.py as a function that returns a final ROI"""
+from thompson.sin_step.main import *
+from thompson.sin_step.thompson import *
 import numpy as np
 import random
 
 
-def test(budget, time, amount_campaigns):
-
+def test(budget, time, amount_campaigns, roi_range):
     id_names = []
     initial_rois = []
     for i in range(amount_campaigns):
         id_names.append(i)
-        initial_rois.append(np.random.uniform(1.2, 2.6))
+        initial_rois.append(np.random.uniform(roi_range[0], roi_range[1]))
 
     initial_percentual_allocation = {}
     for name in id_names:
@@ -41,17 +41,15 @@ def test(budget, time, amount_campaigns):
     return round((sum(absolute_profit) / sum(total_spent)) * 100 - 100, 2)
 
 
-iterations = 2000
+def run_test(total_budget, total_time, amount_campaigns, iterations, roi_range):
+    total_results = []
+    for i in range(iterations):
+        result = test(total_budget, total_time, amount_campaigns, roi_range)
+        total_results.append(result)
 
-total_budget = 5000 #  random.randint(500, 9000000)
-total_time = 100 #  random.randint(50, 200)
-amount_campaigns = 3 #  random.randint(3, 8)
+    average_roi = sum(total_results) / iterations
+    return round(average_roi, 2)
 
-total_results = []
-for i in range(iterations):
-    result = test(total_budget, total_time, amount_campaigns)
-    total_results.append(result)
 
-average_ROI = sum(total_results) / iterations
-print(f'AVERAGE ROI: {round(average_ROI, 2)}%')
+
 

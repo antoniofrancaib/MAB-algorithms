@@ -1,14 +1,12 @@
 import numpy as np
-from main import *
+from thompson.sin_step.main import *
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 import math
 
 class ThompsonCampaign(object):
-    """ This class has information about the normal distribution of the ROI estimate for each campaign
-    beta distribution is not possible as ROI is expected to be more than 1 but beta distribution values go from 0 to 1
-    """
+    """ This class has information about the probability distribution of the ROI estimate for each campaign"""
     def __init__(self, id):
         self.id = id
         self.N = 0  # Time step num
@@ -18,21 +16,8 @@ class ThompsonCampaign(object):
         self.spent_campaign = []
         self.profitability_campaign = []  # absolute return on that campaign
 
-    def sample(self):
-        """
-        Returns a random sample of the distribution
-        """
-        threshold = 0.1
-        sample = np.random.randn() / np.sqrt(self.variance) + self.mean_estimate
-        if sample > 0:
-            return sample
-        else:
-            return threshold
-
     def update(self, roi, spent):
-        """
-        x --> ROI en un time step
-        """
+        """ updates the mean estimate and the variance given a new roi and new spent (in the last time step)"""
         self.variance = pow((1 / pow(100, 2) + self.N), -1)
         self.spent_campaign.append(spent)
         self.profitability_campaign.append(roi * spent)
@@ -57,6 +42,7 @@ class ThompsonAgent(object):
         self.state.update(distribution)
 
     def plot(self):
+        """plots the current probability distributions of the existing campaigns """
         x = np.linspace(-3, 6, 200)
         for t_campaign in self.state.t_campaigns:
             y = norm.pdf(x, t_campaign.mean_estimate, np.sqrt(t_campaign.variance))

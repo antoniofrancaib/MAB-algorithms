@@ -22,6 +22,7 @@ if answer1 == 'y':
 else:
     for i in range(amount_campaigns):
         ROIs.append(np.random.uniform(0.5, 1.5))"""
+
 initial_ROIs = []
 for i in range(amount_campaigns):
     initial_ROIs.append(np.random.uniform(1.2, 2.5))
