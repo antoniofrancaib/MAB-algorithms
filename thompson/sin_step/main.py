@@ -51,20 +51,7 @@ class State(Campaign):
     def dynamic(self, budget_distribution):
         """gives new ROI, gives new spent, i.e. simulates an interaction with the real world"""
         for campaign in self.campaigns:
-            a = random.randint(0, 2)
-            roi_obtained = []
-            if a == 0:
-                roi_obtained.append(campaign.roi[-1] * 1.05)
-            elif a == 1:
-                if campaign.roi[-1] > 1:
-                    roi_obtained.append(campaign.roi[-1] * 0.95)
-                elif campaign.roi[-1] > 0:
-                    roi_obtained.append(campaign.roi[-1] * 0.99)
-                else:
-                    roi_obtained.append(campaign.roi[-1] * 1.01)
-            else:
-                roi_obtained.append(campaign.roi[-1])
-            campaign.roi.append(sum(roi_obtained))
+            campaign.roi.append(np.random.uniform(campaign.roi[-1] - 0.3, campaign.roi[-1] + 0.3))
 
         total_spent = []
         for i, budget in enumerate(budget_distribution):
