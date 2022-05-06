@@ -17,3 +17,16 @@ thompson_sin_step,4000,500000,10000,10,"[0.4, 4]",2.68075
 thompson_con_step,4000,500000,10000,10,"[0.4, 4]",2.1925
 thompson_con_step,4000,500000,10000,10,"[0.4, 4]",2.186
 thompson_con_step,4000,500000,10,10,"[0.4, 4]",2.1975
+thompson_con_step,40,500000,10,10,"[0.4, 4]",2.175
+thompson_sin_step,40,500000,10,10,"[0.4, 4]",2.7
+thompson_sin_step,40,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.65
+thompson_sin_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.6625
+thompson_sin_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.6875
+thompson_sin_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.635
+thompson_sin_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.615
+thompson_sin_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.68
+thompson_sin_step,4000,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.67725
+thompson_sin_step,4000,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.67325
+thompson_con_step,40,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.225
+thompson_con_step,400,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.165
+thompson_sin_step,4000,500000,<module 'time' (built-in)>,10,"[0.4, 4]",2.66775
