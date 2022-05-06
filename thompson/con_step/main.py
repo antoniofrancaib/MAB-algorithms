@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import random
 from xml.sax import parseString
 import numpy as np
-from t_con_step import *
+from thompson.con_step import *
 
 @dataclass
 class Campaign():

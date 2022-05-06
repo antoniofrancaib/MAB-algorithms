@@ -1,5 +1,5 @@
 import numpy as np
-from t_con_step.sin_step.main import *
+from thompson.con_step.main import *
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import scipy.stats as stats
@@ -37,9 +37,15 @@ class ThompsonAgent(object):
         for i, t_campaign in enumerate(self.state.t_campaigns):
             t_campaign.update(self.state.campaigns[i].roi[-1], self.state.campaigns[i].spent[-1])
 
-        """samples each distribution and change state.budget_percentual_distribution"""
-        mean_estimates = [t_campaign.mean_estimate for t_campaign in self.state.t_campaigns]
-        distribution = [estimate / sum(mean_estimates) for estimate in mean_estimates]
+        """samples each distribution, choose one arm to increase a step and one arm to decrease"""
+        samples = []
+        for t_campaign in self.state.t_campaigns:
+            samples.append(t_campaign.sample())
+
+        self.state.budget_percentual_allocation[samples.index(min(samples))] -= self.state.step
+        self.state.budget_percentual_allocation[samples.index(max(samples))] += self.state.step
+
+        distribution = [round(num, 4) for num in self.state.budget_percentual_allocation]
 
         """updates state.percentual_budget_allocation """
         self.state.update(distribution)

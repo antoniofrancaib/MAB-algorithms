@@ -3,7 +3,7 @@ Here, we aim to make general tests that compare different algorithms + save this
 
 import csv
 from thompson.sin_step.test import run_test as thompson_sin_step
-# from thompson.con_step.test import run_test as thompson_con_step
+from thompson.con_step.test import run_test as thompson_con_step
 # from optimistic.test import run_test as optimistic
 # from ucb.test import run_test as ucb
 # from epsilon_greedy.test import run_test as epsilon_greedy
@@ -16,12 +16,15 @@ iterations = 4000
 budget = 500000 #  random.randint(500, 9000000)
 time = 10000 #  random.randint(50, 200)
 amount_campaigns = 10 #  random.randint(3, 8)
-initial_rois_range = [0.8, 3] # which is the range of values we expect to get for the first ROI
+initial_rois_range = [0.4, 4] # which is the range of values we expect to get for the first ROI
 
 
 """THIS IS THE OUTPUT OF THE TEST, THE OVERALL ROI OBTAINED"""
 if algorithm == 'thompson_sin_step':
     final_roi = thompson_sin_step(budget, time, amount_campaigns, iterations, initial_rois_range)
+
+if algorithm == 'thompson_con_step':
+    final_roi = thompson_con_step(budget, time, amount_campaigns, iterations, initial_rois_range)
 
 
 # if algorithm == 'thompson_con_step':
