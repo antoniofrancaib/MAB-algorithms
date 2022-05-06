@@ -22,7 +22,7 @@ dynamic_mode = 'soft' #  maybe, we could put it as a new variable in the csv"""
 algorithm = 'thompson_con_step'
 iterations = 4000
 budget = 500000 #  random.randint(500, 9000000)
-time = 10000 #  random.randint(50, 200)
+time = 10 #  random.randint(50, 200)
 amount_campaigns = 10 #  random.randint(3, 8)
 initial_rois_range = [0.4, 4] # which is the range of values we expect to get for the first ROI
 

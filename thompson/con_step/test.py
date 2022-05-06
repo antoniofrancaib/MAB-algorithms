@@ -27,7 +27,7 @@ def test(budget, time, amount_campaigns, roi_range):
     state = State(budget, time, campaigns, t_campaigns, initial_percentual_allocation)
     thompson_agent = ThompsonAgent(state)
 
-    for i in range(10):
+    for i in range(time):
         budgets = [campaign.budget for campaign in campaigns]
         state.dynamic(budgets)
         thompson_agent.act()

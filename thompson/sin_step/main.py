@@ -44,8 +44,8 @@ class State(Campaign):
         """updates current_time, and remaining_budget"""
         self.current_time += 1
         self.remaining_budget -= self.spent[-1]
-        if self.remaining_budget <= 0:
-            raise Exception('No budget left')
+        #  if self.remaining_budget <= 0:
+            #  raise Exception('No budget left')
 
 
     def dynamic(self, budget_distribution):
