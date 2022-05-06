@@ -1,6 +1,6 @@
 """ we run this test.py as a function that returns a final ROI"""
 from thompson.sin_step.main import *
-from thompson.sin_step.thompson import *
+from thompson.sin_step.t_sin_step import *
 import numpy as np
 import random
 

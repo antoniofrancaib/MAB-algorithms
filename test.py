@@ -1,4 +1,5 @@
-"""Here, we aim to make general tests that automatically save the information in a csv file"""
+"""TEST ALL THE ALGORITHMS WITH THIS DOC. DO NOT DO IT WITH THE INDIVIDUAL TEST DOCS
+Here, we aim to make general tests that compare different algorithms + save this information in a csv file"""
 
 import csv
 from thompson.sin_step.test import run_test as thompson_sin_step

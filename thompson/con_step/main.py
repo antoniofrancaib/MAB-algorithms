@@ -1,236 +1,66 @@
 from cmath import isnan
+from dataclasses import dataclass
 import random
 from xml.sax import parseString
 import numpy as np
-import matplotlib.pyplot as plt
-import copy
+from t_con_step import *
 
-
-#import time
-
-from mab import *
-
+@dataclass
 class Campaign():
+    def __init__(self, id, budget, impressions, conversions, roi):
+        """Campaign Object with information about the campaign. We instantiate campaigns from this object."""
+        self.id = id
+        self.budget = budget  # daily budget
+        self.impressions = [impressions]
+        self.conversions = [conversions]
 
-    def __init__(self,id,budget,spent,impressions,conversions,roi):
-        #falta determinar como podemos saber el tiempo que lleva la campaña 
-        self.id = id    
-        self.budget = budget #daily budget
-        self.spent = spent
-        self.impressions = impressions
-        self.conversions = conversions
-        self.roi = roi
+        self.roi = [roi]
+        self.spent =[]
 
-    def update(self,impressions,conversions,roi):
-        self.spent += self.budget
-        self.impressions += int(impressions)
-        self.conversions += int(conversions)
-        self.roi = float(roi)
-
-    def change_budget(self,increment):
-        #increment debe ser un valor numerico para editar el ( daily budget )
-        self.budget = self.budget + increment
-    
 
 class State(Campaign):
-
-    def __init__(self,budget,total_time,campaigns,initial_allocation=0):
-        self.budget = budget
-        self.time = total_time
+    def __init__(self, total_budget, total_time, campaigns, t_campaigns, initial_percentual_allocation):
+        """State Object with information about the state. We instantiate states from this object."""
+        self.total_budget = total_budget
+        self.remaining_budget = total_budget
+        self.total_time = total_time
         self.campaigns = campaigns
+        self.t_campaigns = t_campaigns
+        self.spent = []
         self.current_time = 0
-        self.current_budget = self.budget/self.time
-        #dictionary that contains all states, where the key is a timestamp
-        self.history = {}
-        self.budget_allocation = {}
-        self.remaining = budget
-
+        self.current_budget = self.remaining_budget / self.total_time
+        self.history = {}  # key is time step, value is state
+        self.budget_percentual_allocation = initial_percentual_allocation
         self.step = 0.005
+        self.max_step = 0.01
 
-        self.k_arms = len(campaigns)
+    def update(self, distribution):
+        """updates the budget_distribution in the state"""
+        for i, campaign in enumerate(self.budget_percentual_allocation):
+            self.budget_percentual_allocation[campaign] = distribution[i]
 
-        self.stopped = []
-        if initial_allocation == 0: 
-            self.initial_allocation()
-        else:
-            for campaign in campaigns:
-                self.budget_allocation[campaign.id] = initial_allocation[campaign.id]
+        """updates budgets allocating the assigned budget to each campaign"""
+        for campaign in self.campaigns:
+            campaign.budget = round(self.current_budget * self.budget_percentual_allocation[campaign.id], 8)
 
-    def next_step(self):
+        """updates current_time, increase step, and remaining_budget"""
+        self.step = min(self.step * 1.001, self.max_step)
         self.current_time += 1
-        print(f'time {self.current_time}')
-        self.remaining-=self.current_budget
-        if self.remaining <= 0:
+        self.remaining_budget -= self.spent[-1]
+        if self.remaining_budget <= 0:
             raise Exception('No budget left')
-        #increase the capacity of an agent to take significant budget decisions
-        self.step *= 1.001
 
 
-    def get_reward(self):
-        if self.current_time == 0:
-            return list(np.zeros(len(self.budget_allocation)))
-        rewards = [] 
+    def dynamic(self, budget_distribution):
+        """gives new ROI, gives new spent, i.e. simulates an interaction with the real world"""
         for campaign in self.campaigns:
-            rewards.append(campaign.roi*self.current_budget*self.budget_allocation[campaign.id])
-        norm = [float(i)/sum(rewards) for i in rewards]
-        print(f'The rewards at timestamp {self.current_time} is {rewards}')
-        return norm
+            campaign.roi.append(np.random.uniform(campaign.roi[-1] - 0.3, campaign.roi[-1] + 0.3))
 
-    def take_action(self,arm,dec):
-        if self.current_time < 1:
-            pass
-        else: 
-            print(f'AI is increasing budget of campaign {arm}')
-            self.act3(arm,dec)
-        b = copy.deepcopy(self.budget_allocation)
-        rewards = self.get_reward()
-        self.history[self.current_time] = [b,rewards]
-        print(f'Current state: {self.budget_allocation} at timestamp {self.current_time}')
-        self.allocate_budget()
-        self.next_step()
-        return rewards
-
-    def act3(self,arm,dec):
-        temp_budget = copy.deepcopy(self.budget_allocation)
-        temp_budget[arm] += self.step
-        if dec not in self.stopped:
-            temp_budget[dec] -= self.step
-            if temp_budget[dec] < 0: 
-                temp_budget[dec] = 0
-                self.stopped.append(dec)
-        else:
-            a = True
-            while a:
-                dec = random.randint(0,len(self.campaigns)-1)
-                if dec != arm:
-                    if dec not in self.stopped:
-                        temp_budget[dec] -= self.step
-                        print(f'Ai has decreased campaign {dec}')
-                    a = False
-           
-        for campaign in temp_budget:
-            temp_budget[campaign] = round(temp_budget[campaign],8)
-        #validate that the budget is corrent before updating it
-        if self.validate_budget(temp_budget):
-            self.budget_allocation = temp_budget
-        else:
-            print(f"Chosen arm: {arm}, Stopped Campaigns: {self.stopped}")
-            raise Exception(f'Budget is not valid, act3 policy has failed, Failed budget is {temp_budget}')
-            
-    def act2(self,arm,q_values):
-        population = list(range(len(self.campaigns)))
-        step = self.step
-        temp_budget = copy.deepcopy(self.budget_allocation)
-        temp_budget[arm] += step
-        q_values = q_values.tolist()
-        # SOLUTION TO BUG ID 7
-        #print(f"---{len(population)-len(self.stopped)}")
-        #time.sleep(0.01)
-        if len(population)-len(self.stopped)==1:
-            temp_budget[arm] = 1
-        else:
-            #if we have no data, randomly decrease an campaign
-            if all(v == 0 for v in q_values):
-                dec = random.randint(0,len(self.campaigns)-1)
-                if dec != arm:
-                    temp_budget[dec] -= step
-                else:
-                    while dec == arm:
-                        dec = random.randint(0,len(self.campaigns)-1)
-                    temp_budget[dec] -= step
-            #if we have data, take a stochastic approach 
-            else:
-                norm = [float(i)/sum(q_values) for i in q_values]
-                decrease_prob = [1-p for p in norm]
-                #print(f'norm is {norm}')
-                #print(f'population is {population}')
-                dec = int(random.choices(population, weights=decrease_prob, k=1)[0])
-                #we could test another action policy where the chosen arm would be also subject to a decrease, 
-                # that would result in no action, I'll ignore that option 
-                if dec != arm and dec not in self.stopped:
-                    #TODO SOLUTION OF BUG 1
-                    if temp_budget[dec] < step:
-                        temp_budget[arm] -= temp_budget[dec]
-                        #temp_budget[arm] -= step
-                        temp_budget[dec] = 0
-                        print(f'##### Campaign {dec} was stopped completely ###')
-                        #TODO delete campaign from the state ( make it ignore it )
-                        self.stopped.append(dec)
-                    else:
-                        temp_budget[dec] -= step
-                else:
-                    while True:
-                        dec = int(random.choices(population, weights=decrease_prob, k=1)[0])
-                        if dec == arm:
-                            continue
-                        if dec in self.stopped:
-                            continue
-                        else:
-                            break
-                    #SOLUTION OF BUG 1
-                    if temp_budget[dec] < step:
-                        temp_budget[arm] -= temp_budget[dec]
-                        temp_budget[arm] -= step
-                        temp_budget[dec] = 0
-                        print(f'##### Campaign {dec} was stopped completely ###')
-                        self.stopped.append(dec)
-                    else:
-                        temp_budget[dec] -= step
-                print(f'Ai has decreased campaign {dec} given probs {decrease_prob}')
-        #round the budget to avoid RuntimeWarning: invalid value encountered in double_scalars
-        for campaign in temp_budget:
-            temp_budget[campaign] = round(temp_budget[campaign],8)
-        #validate that the budget is corrent before updating it
-        if self.validate_budget(temp_budget):
-            #update budget
-            self.budget_allocation = temp_budget
-        else:
-            print(f"Chosen arm: {arm}, Stopped Campaigns: {self.stopped}")
-            raise Exception(f'Budget is not valid, act2 policy has failed, Failed budget is {temp_budget}')
-            
-    @staticmethod        
-    def get_state(budget_allocation):
-        return tuple(budget_allocation.values())
-
-    def initial_allocation(self):
-        for campaign in self.campaigns:
-            self.budget_allocation[campaign.id] = round(1/len(self.campaigns),8)
-        b = copy.deepcopy(self.budget_allocation)
-        self.history[self.current_time] = [b,self.get_reward()]
-        self.allocate_budget()
-
-    def allocate_budget(self):
-        #turns a distribution into a value
-        #campaign budget = current budget * campaign%allocation
-        for campaign in self.campaigns:
-            campaign.budget = round(self.current_budget*self.budget_allocation[campaign.id],8)
-        
-    @staticmethod
-    def validate_budget(budget_allocation):
-        total = 0
-        for campaign in budget_allocation.values():
-            if campaign > 1: return False
-            elif campaign < 0: return False
-            else:
-                total += campaign
-        total = round(total,4)
-        if total > 0.95 and total <= 1.025:
-            return True
-        else: return False
-    
-    def dynamic(self):
-        for campaign in self.campaigns:
-            a = random.randint(0,2)
-            if a == 0:
-                campaign.roi *= 1.05
-            elif a == 1:
-                if campaign.roi > 1:
-                    campaign.roi *= 0.95
-                elif campaign.roi > 0:
-                    campaign.roi *= 0.99
-                else:
-                    campaign.roi *= 1.01
-            else: 
-                return self
-    
-                
+        total_spent = []
+        for i, budget in enumerate(budget_distribution):
+            percentual_spent = random.randint(95, 100)
+            spent = (percentual_spent / 100)*budget
+            total_spent.append(spent)
+        self.spent.append(sum(total_spent))
+        for i, campaign in enumerate(self.campaigns):
+            campaign.spent.append(total_spent[i])

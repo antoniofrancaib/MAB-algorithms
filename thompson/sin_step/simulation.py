@@ -1,5 +1,9 @@
+"""
+WE  USE ALL THIS IN THE test FUNCTION IN test.py DOC. HERE YOU HAVE ALL THE PROCESS IN A BETTER EXPLAINED MANNER
+"""
+
 from main import *
-from thompson import *
+from t_sin_step import *
 import numpy as np
 
 budget = 1000             #input('Introduce amount of budget: ')
