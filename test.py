@@ -21,10 +21,10 @@ dynamic_mode = 'soft' #  maybe, we could put it as a new variable in the csv"""
 # For the sake of uniformity in names: the possible names of the algorithms are =
 # thompson_con_step, thompson_sin_step, optimistic, epsilon_greedy, optimistic, ucb
 algorithm = 'thompson_sin_step'
-iterations = 4000
+iterations = 1
 budget = 500000 #  random.randint(500, 9000000)
-time_steps = 10000 #  random.randint(50, 200)
-amount_campaigns = 10 #  random.randint(3, 8)
+time_steps = 10 #  random.randint(50, 200)
+amount_campaigns = 3 #  random.randint(3, 8)
 initial_rois_range = [0.4, 4] # which is the range of values we expect to get for the first ROI
 
 """THIS IS THE OUTPUT OF THE TEST, THE OVERALL ROI OBTAINED"""
@@ -48,12 +48,12 @@ print(f'FINAL ROI: {final_roi}\n')
  use mode='a' to append new rows instead; when appending, comment out writer.writeheader() 
  because it will add the header in an intermediate row otherwise; that is only to create a new csv file"""
 
-with open('test_data.csv', mode='a') as csv_file:
+"""with open('test_data.csv', mode='a') as csv_file:
     fieldnames = ['ALGORITHM', 'ITERATIONS', 'BUDGET', 'TIME', 'AMOUNT CAMPAIGNS', 'INITIAL ROIS RANGE', 'FINAL ROI']
     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
     row = {'ALGORITHM': algorithm, 'ITERATIONS': iterations, 'BUDGET': budget, 'TIME': time,
            'AMOUNT CAMPAIGNS': amount_campaigns, 'INITIAL ROIS RANGE': initial_rois_range, 'FINAL ROI': final_roi}
 
     #  writer.writeheader()
-    writer.writerow(row)
+    writer.writerow(row)"""
 

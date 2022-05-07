@@ -38,7 +38,7 @@ def test(budget, time, amount_campaigns, roi_range):
         absolute_profit.append(sum(t_campaign.profitability_campaign))
         total_spent.append(sum(t_campaign.spent_campaign))
 
-    return round(sum(absolute_profit) / sum(total_spent))
+    return round(sum(absolute_profit) / sum(total_spent), 4)
 
 
 def run_test(total_budget, total_time, amount_campaigns, iterations, roi_range):
@@ -48,7 +48,7 @@ def run_test(total_budget, total_time, amount_campaigns, iterations, roi_range):
         total_results.append(result)
 
     average_roi = sum(total_results) / iterations
-    return round(average_roi, 6)
+    return round(average_roi, 4)
 
 
 
