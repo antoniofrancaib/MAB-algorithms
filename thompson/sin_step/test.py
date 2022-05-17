@@ -38,18 +38,6 @@ def test(budget, time, amount_campaigns, roi_range):
         thompson_agent.act()
         print(f'Budget Allocation: {state.budget_percentual_allocation}')
 
-        "validate here"
-        total = 0
-        for campaign in state.budget_percentual_allocation.values():
-            if campaign > 1:
-                break
-            elif campaign < 0:
-                break
-            else:
-                total += campaign
-        result = round(total, 4)
-        if result < 0.95 or total > 1.025:
-            break
 
 
     absolute_profit = []

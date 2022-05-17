@@ -20,10 +20,10 @@ dynamic_mode = 'soft' #  maybe, we could put it as a new variable in the csv"""
 """THESE ARE THE INPUTS OF THE TEST, THE VARIABLES"""
 # For the sake of uniformity in names: the possible names of the algorithms are =
 # thompson_con_step, thompson_sin_step, optimistic, epsilon_greedy, optimistic, ucb
-algorithm = 'thompson_sin_step'
+algorithm = 'thompson_con_step'
 iterations = 1
 budget = 500000 #  random.randint(500, 9000000)
-time_steps = 50000 #  random.randint(50, 200)
+time_steps = 500 #  random.randint(50, 200)
 amount_campaigns = 3 #  random.randint(3, 8)
 initial_rois_range = [0.4, 4] # which is the range of values we expect to get for the first ROI
 

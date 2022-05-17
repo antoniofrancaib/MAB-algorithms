@@ -6,7 +6,7 @@ import numpy as np
 from thompson.sin_step import *
 
 @dataclass
-class Campaign():
+class Campaign:
     def __init__(self, id, budget, impressions, conversions, roi):
         """Campaign Object with information about the campaign. We instantiate campaigns from this object."""
         self.id = id
@@ -18,7 +18,7 @@ class Campaign():
         self.spent =[]
 
 
-class State(Campaign):
+class State:
     def __init__(self, total_budget, total_time, campaigns, t_campaigns, initial_percentual_allocation):
         """State Object with information about the state. We instantiate states from this object."""
         self.total_budget = total_budget
