@@ -45,11 +45,13 @@ class State(Campaign):
         self.current_time += 1
         self.remaining_budget -= self.spent[-1]
 
+        """validate"""
+        #  assert self.validate_budget(self.budget_percentual_allocation),f'Budget {self.budget_percentual_allocation} not valid'
 
     def dynamic(self, budget_distribution):
         """gives new ROI, gives new spent, i.e. simulates an interaction with the real world"""
         for campaign in self.campaigns:
-            campaign.roi.append(np.random.uniform(campaign.roi[-1] - 0.3, campaign.roi[-1] + 0.3))
+            campaign.roi.append(max(np.random.uniform(campaign.roi[-1] - 0.2, campaign.roi[-1] + 0.2), 0.5))
 
         total_spent = []
         for i, budget in enumerate(budget_distribution):
@@ -59,3 +61,20 @@ class State(Campaign):
         self.spent.append(sum(total_spent))
         for i, campaign in enumerate(self.campaigns):
             campaign.spent.append(total_spent[i])
+
+
+    @staticmethod
+    def validate_budget(budget_distribution):
+        total = 0
+        for campaign in budget_distribution.values():
+            if campaign > 1:
+                return False
+            elif campaign < 0:
+                return False
+            else:
+                total += campaign
+        result = round(total, 4)
+        if result > 0.95 and total <= 1.025:
+            return True
+        else:
+            return False

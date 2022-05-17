@@ -28,9 +28,29 @@ def test(budget, time, amount_campaigns, roi_range):
     thompson_agent = ThompsonAgent(state)
 
     for i in range(time):
+        print(f'\n ··········TIMESTEP {i + 1}·············\n')
         budgets = [campaign.budget for campaign in campaigns]
+        for i, t_campaign in enumerate(t_campaigns):
+            print(f'Mean Estimate {i + 1}: {t_campaign.mean_estimate}')
+        print(sum(budgets))
+        print(budgets)
         state.dynamic(budgets)
         thompson_agent.act()
+        print(f'Budget Allocation: {state.budget_percentual_allocation}')
+
+        "validate here"
+        total = 0
+        for campaign in state.budget_percentual_allocation.values():
+            if campaign > 1:
+                break
+            elif campaign < 0:
+                break
+            else:
+                total += campaign
+        result = round(total, 4)
+        if result < 0.95 or total > 1.025:
+            break
+
 
     absolute_profit = []
     total_spent = []
